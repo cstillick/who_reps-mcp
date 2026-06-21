@@ -1,0 +1,22 @@
+{
+  "result": {
+    "input": { "address": { "address": "1600 Pennsylvania Ave NW, Washington, DC 20500" } },
+    "addressMatches": [
+      {
+        "matchedAddress": "1600 PENNSYLVANIA AVE NW, WASHINGTON, DC, 20500",
+        "coordinates": { "x": -77.0365, "y": 38.8977 },
+        "geographies": {
+          "States": [
+            { "STUSAB": "DC", "STATE": "11", "BASENAME": "District of Columbia", "NAME": "District of Columbia" }
+          ],
+          "Congressional Districts": [
+            { "BASENAME": "98", "NAME": "Delegate District (at Large)", "STATE": "11" }
+          ],
+          "Counties": [
+            { "BASENAME": "District of Columbia", "STATE": "11", "COUNTY": "001" }
+          ]
+        }
+      }
+    ]
+  }
+}

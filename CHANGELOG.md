@@ -4,6 +4,11 @@ All notable changes to this project will be documented here.
 
 ## [Unreleased]
 
+### M1 — Geocoding (Census)
+- `sources/census.py`: address → `GeoResult` (lat/lon, state, congressional district, state-leg districts, derived OCD divisions). Pure `parse_geographies` + cached live `geocode`.
+- `cache.py`: SQLite key/value cache with TTL.
+- Tests against recorded Census fixtures (OK-5 + DC degradation path).
+
 ### M0 — Scaffold
 - `pyproject.toml` (uv, hatchling, src layout); package `whoreps_mcp` with `sources/` subpackage.
 - Typed `Settings` (optional `OPENSTATES_API_KEY` / `CONGRESS_GOV_API_KEY`, `CACHE_PATH`); pydantic models (`GeoResult`, `Official`, `OfficialsResponse`).
