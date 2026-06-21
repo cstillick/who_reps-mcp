@@ -1,0 +1,62 @@
+# Trimmed subset of unitedstates/congress-legislators legislators-current.yaml,
+# covering the test states (OK, DC). Real current officials (119th Congress).
+- id:
+    bioguide: L000575
+  name:
+    first: James
+    last: Lankford
+    official_full: James Lankford
+  terms:
+    - type: sen
+      start: '2023-01-03'
+      end: '2029-01-03'
+      state: OK
+      class: 3
+      party: Republican
+      url: https://www.lankford.senate.gov
+      phone: 202-224-5754
+- id:
+    bioguide: M001190
+  name:
+    first: Markwayne
+    last: Mullin
+    official_full: Markwayne Mullin
+  terms:
+    - type: sen
+      start: '2023-01-03'
+      end: '2029-01-03'
+      state: OK
+      class: 2
+      party: Republican
+      url: https://www.mullin.senate.gov
+      phone: 202-224-4721
+- id:
+    bioguide: B001302
+  name:
+    first: Stephanie
+    last: Bice
+    official_full: Stephanie I. Bice
+  terms:
+    - type: rep
+      start: '2025-01-03'
+      end: '2027-01-03'
+      state: OK
+      district: 5
+      party: Republican
+      url: https://bice.house.gov
+      phone: 202-225-2132
+- id:
+    bioguide: N000147
+  name:
+    first: Eleanor
+    last: Norton
+    official_full: Eleanor Holmes Norton
+  terms:
+    - type: rep
+      start: '2025-01-03'
+      end: '2027-01-03'
+      state: DC
+      district: 0
+      party: Democrat
+      url: https://norton.house.gov
+      phone: 202-225-8050

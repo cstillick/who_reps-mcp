@@ -4,6 +4,10 @@ All notable changes to this project will be documented here.
 
 ## [Unreleased]
 
+### M2 — Federal officials
+- `sources/federal.py`: `unitedstates/congress-legislators` roster → state + CD → 2 U.S. Senators + the House member (or delegate for DC/territories), normalized to `Official` with party, website, phone, term_end, photo, source, as_of. Pure `officials_for` + cached live `load_roster`.
+- Vendored YAML fixture (real current OK + DC officials) drives offline tests.
+
 ### M1 — Geocoding (Census)
 - `sources/census.py`: address → `GeoResult` (lat/lon, state, congressional district, state-leg districts, derived OCD divisions). Pure `parse_geographies` + cached live `geocode`.
 - `cache.py`: SQLite key/value cache with TTL.
