@@ -4,6 +4,10 @@ All notable changes to this project will be documented here.
 
 ## [Unreleased]
 
+### M3 — `lookup_officials` (federal tier) end to end
+- `service.py`: geocode → federal roster → `OfficialsResponse`, with coverage notes (no senators for DC/territories, missing state legislature) and a concise text summary. Sources injectable for offline tests.
+- MCP tools `lookup_officials` + `list_districts`; CLI `lookup` / `districts`.
+
 ### M2 — Federal officials
 - `sources/federal.py`: `unitedstates/congress-legislators` roster → state + CD → 2 U.S. Senators + the House member (or delegate for DC/territories), normalized to `Official` with party, website, phone, term_end, photo, source, as_of. Pure `officials_for` + cached live `load_roster`.
 - Vendored YAML fixture (real current OK + DC officials) drives offline tests.

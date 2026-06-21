@@ -36,6 +36,28 @@ def serve() -> None:
 
 
 @app.command()
+def lookup(address: str = typer.Argument(..., help="A U.S. street address.")) -> None:
+    """Look up the elected officials for an address."""
+    import json
+
+    from whoreps_mcp import service
+
+    resp = service.lookup_officials(address)
+    typer.echo(service.summarize(resp))
+    typer.echo(json.dumps(resp.model_dump(), indent=2))
+
+
+@app.command()
+def districts(address: str = typer.Argument(..., help="A U.S. street address.")) -> None:
+    """Show the districts/divisions for an address."""
+    import json
+
+    from whoreps_mcp import service
+
+    typer.echo(json.dumps(service.list_districts(address), indent=2))
+
+
+@app.command()
 def version() -> None:
     """Print the whoreps-mcp version."""
     typer.echo(f"whoreps-mcp {__version__}")
