@@ -4,6 +4,11 @@ All notable changes to this project will be documented here.
 
 ## [Unreleased]
 
+### M4 — State tier
+- `sources/openstates.py`: `people.geo` (lat/lng → state legislators), pure `parse_people` + cached live `people_geo` that degrades to `[]` without a key.
+- `sources/governors.py` + `data/governors.json`: vendored, dated governor snapshot (all 50 states) with `as_of` surfaced on every record; refresh process in `docs/governors.md`.
+- Service merges governor + state legislators and emits `coverage_notes` for gaps (DC: no senators, Mayor not Governor, no state legislature). Federal tier always returns even when state tiers are missing.
+
 ### M3 — `lookup_officials` (federal tier) end to end
 - `service.py`: geocode → federal roster → `OfficialsResponse`, with coverage notes (no senators for DC/territories, missing state legislature) and a concise text summary. Sources injectable for offline tests.
 - MCP tools `lookup_officials` + `list_districts`; CLI `lookup` / `districts`.

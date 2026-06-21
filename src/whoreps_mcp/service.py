@@ -11,7 +11,7 @@ from datetime import date
 
 from whoreps_mcp.config import Settings, get_settings
 from whoreps_mcp.models import OfficialsResponse
-from whoreps_mcp.sources import census, federal
+from whoreps_mcp.sources import census, federal, governors, openstates
 from whoreps_mcp.sources.census import TERRITORY_LIKE
 
 _PARTY_ABBR = {
@@ -28,24 +28,43 @@ def lookup_officials(
     *,
     settings: Settings | None = None,
     legislators: list[dict] | None = None,
+    openstates_payload: dict | None = None,
     as_of: str | None = None,
 ) -> OfficialsResponse:
     settings = settings or get_settings()
     as_of = as_of or date.today().isoformat()
 
     geo = census.geocode(address, settings)
+    notes: list[str] = []
+
+    # Federal tier.
     roster = legislators if legislators is not None else federal.load_roster(settings)
     officials = federal.officials_for(geo.state, geo.congressional_district, roster, as_of)
-
-    notes: list[str] = []
     if geo.state in TERRITORY_LIKE:
         notes.append(
             f"{geo.state} has no U.S. Senators; its U.S. House seat is a non-voting delegate."
         )
+
+    # State executive tier (Governor).
+    governor = governors.governor_for(geo.state)
+    if governor is not None:
+        officials.append(governor)
+    elif geo.state == "DC":
+        notes.append("DC has a Mayor, not a Governor; not included.")
+    else:
+        notes.append(f"Governor data unavailable for {geo.state}.")
+
+    # State legislative tier (OpenStates).
     if not geo.state_leg_districts:
         notes.append(
             "No state legislative districts for this address (e.g. DC has no state legislature)."
         )
+    elif openstates_payload is not None:
+        officials += openstates.parse_people(openstates_payload, as_of)
+    elif settings.openstates_api_key and geo.lat and geo.lon:
+        officials += openstates.people_geo(geo.lat, geo.lon, settings, as_of)
+    else:
+        notes.append("State legislators omitted — set OPENSTATES_API_KEY to include them.")
 
     return OfficialsResponse(
         matched_address=geo.matched_address,

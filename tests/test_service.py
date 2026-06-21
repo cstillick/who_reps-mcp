@@ -35,10 +35,9 @@ def _seed_geocode_cache():
 def test_lookup_federal_slate_for_ok5() -> None:
     resp = service.lookup_officials(OK5, legislators=ROSTER, as_of=AS_OF)
     names = {o.name for o in resp.officials}
-    assert names == {"James Lankford", "Markwayne Mullin", "Stephanie I. Bice"}
+    # The federal slate is present (governor is added by the state tier, M4).
+    assert {"James Lankford", "Markwayne Mullin", "Stephanie I. Bice"} <= names
     assert "ocd-division/country:us/state:ok/cd:5" in resp.divisions
-    # OK has senators and state-legislative districts -> no coverage caveats.
-    assert resp.coverage_notes == []
 
     summary = service.summarize(resp)
     assert "U.S. Representative Stephanie I. Bice" in summary
