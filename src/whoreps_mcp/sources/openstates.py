@@ -80,3 +80,40 @@ def people_geo(lat: float, lng: float, settings: Settings, as_of: str) -> list[O
     if not settings.openstates_api_key:
         return []
     return parse_people(fetch_people_geo(lat, lng, settings), as_of)
+
+
+def people_by_district(
+    state: str, org_classification: str, district: str | None, settings: Settings, as_of: str
+) -> list[Official]:  # pragma: no cover - network
+    """State legislators for a chamber + district. [] without a key."""
+    if not settings.openstates_api_key:
+        return []
+    resp = httpx.get(
+        f"{settings.openstates_base}/people",
+        params={
+            "jurisdiction": f"ocd-jurisdiction/country:us/state:{state.lower()}/government",
+            "org_classification": org_classification,
+            "district": district,
+        },
+        headers={"X-API-Key": settings.openstates_api_key},
+        timeout=30.0,
+    )
+    resp.raise_for_status()
+    return parse_people(resp.json(), as_of)
+
+
+def person_detail(
+    person_id: str, settings: Settings, as_of: str
+) -> dict:  # pragma: no cover - network
+    """Enriched detail for one state official by OpenStates person id."""
+    resp = httpx.get(
+        f"{settings.openstates_base}/people",
+        params={"id": person_id, "include": ["offices", "other_identifiers"]},
+        headers={"X-API-Key": settings.openstates_api_key or ""},
+        timeout=30.0,
+    )
+    resp.raise_for_status()
+    people = parse_people(resp.json(), as_of)
+    if not people:
+        return {"id": person_id, "found": False}
+    return {**people[0].model_dump(), "committees": []}

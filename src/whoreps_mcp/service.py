@@ -85,6 +85,87 @@ def list_districts(address: str, *, settings: Settings | None = None) -> dict:
     }
 
 
+def lookup_by_district(
+    state: str,
+    chamber: str,
+    district: str | None = None,
+    *,
+    settings: Settings | None = None,
+    legislators: list[dict] | None = None,
+    as_of: str | None = None,
+) -> list:
+    """Officials for a chamber + district, skipping geocoding.
+
+    ``chamber``: senate | house (federal), or upper | lower (state).
+    """
+    settings = settings or get_settings()
+    as_of = as_of or date.today().isoformat()
+    state = state.upper()
+    ch = chamber.lower()
+
+    if ch in ("senate", "us_senate", "sen"):
+        roster = legislators if legislators is not None else federal.load_roster(settings)
+        return [
+            o
+            for o in federal.officials_for(state, None, roster, as_of)
+            if o.office == "U.S. Senator"
+        ]
+
+    if ch in ("house", "us_house", "rep", "representative", "cd"):
+        roster = legislators if legislators is not None else federal.load_roster(settings)
+        return [
+            o
+            for o in federal.officials_for(state, district, roster, as_of)
+            if o.office in ("U.S. Representative", "U.S. Delegate")
+        ]
+
+    if ch in ("upper", "lower", "state_senate", "state_house"):
+        oc = "upper" if ch in ("upper", "state_senate") else "lower"
+        return openstates.people_by_district(state, oc, district, settings, as_of)
+
+    raise ValueError(f"unknown chamber {chamber!r}; use senate|house|upper|lower")
+
+
+def get_official_details(
+    official_id: str,
+    *,
+    settings: Settings | None = None,
+    legislators: list[dict] | None = None,
+    as_of: str | None = None,
+) -> dict:
+    """Enriched detail for one official (committees/contact where available)."""
+    settings = settings or get_settings()
+    as_of = as_of or date.today().isoformat()
+
+    if official_id.startswith("governor:"):
+        gov = governors.governor_for(official_id.split(":", 1)[1])
+        if gov is None:
+            return {"id": official_id, "found": False}
+        return {**gov.model_dump(), "committees": []}
+
+    if official_id.startswith(("us_senate:", "us_house:")):
+        roster = legislators if legislators is not None else federal.load_roster(settings)
+        official = federal.official_from_id(official_id, roster, as_of)
+        if official is None:
+            return {"id": official_id, "found": False}
+        bioguide = official_id.split(":")[-1]
+        return {**official.model_dump(), "committees": federal.committees_for(bioguide, settings)}
+
+    if official_id.startswith("ocd-person/"):
+        if not settings.openstates_api_key:
+            return {
+                "id": official_id,
+                "found": False,
+                "note": "Set OPENSTATES_API_KEY to fetch state-official detail.",
+            }
+        detail = openstates.person_detail(
+            official_id, settings, as_of
+        )  # pragma: no cover - network
+        return detail
+
+    return {"id": official_id, "found": False, "note": "unrecognized id"}
+
+
 def summarize(resp: OfficialsResponse) -> str:
     """A concise human-readable one-liner to accompany the structured output."""
     if not resp.officials:

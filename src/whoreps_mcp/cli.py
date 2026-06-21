@@ -57,6 +57,35 @@ def districts(address: str = typer.Argument(..., help="A U.S. street address."))
     typer.echo(json.dumps(service.list_districts(address), indent=2))
 
 
+@app.command("by-district")
+def by_district(
+    state: str = typer.Argument(..., help="USPS state code, e.g. OK."),
+    chamber: str = typer.Argument(..., help="senate|house (federal) or upper|lower (state)."),
+    district: str = typer.Option(
+        None, "--district", help="District number (for house/upper/lower)."
+    ),
+) -> None:
+    """Look up officials by chamber + district (skip geocoding)."""
+    import json
+
+    from whoreps_mcp import service
+
+    officials = service.lookup_by_district(state, chamber, district)
+    typer.echo(json.dumps([o.model_dump() for o in officials], indent=2))
+
+
+@app.command()
+def details(
+    official_id: str = typer.Argument(..., help="An official id from another tool."),
+) -> None:
+    """Show enriched detail for one official."""
+    import json
+
+    from whoreps_mcp import service
+
+    typer.echo(json.dumps(service.get_official_details(official_id), indent=2))
+
+
 @app.command()
 def version() -> None:
     """Print the whoreps-mcp version."""

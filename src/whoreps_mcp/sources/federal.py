@@ -87,6 +87,43 @@ def officials_for(
     return out
 
 
+def find_by_bioguide(roster: list[dict], bioguide: str) -> dict | None:
+    return next((leg for leg in roster if (leg.get("id") or {}).get("bioguide") == bioguide), None)
+
+
+def official_from_id(official_id: str, roster: list[dict], as_of: str) -> Official | None:
+    """Reconstruct a federal Official from a `us_senate:`/`us_house:` id."""
+    parts = official_id.split(":")
+    kind, bioguide = parts[0], parts[-1]
+    leg = find_by_bioguide(roster, bioguide)
+    if leg is None:
+        return None
+    term = _current_term(leg)
+    if kind == "us_senate":
+        return _to_official(leg, term, "U.S. Senator", None, as_of)
+    district = (
+        parts[1].split("-")[-1]
+        if len(parts) > 1 and "-" in parts[1]
+        else str(term.get("district", "0"))
+    )
+    office = "U.S. Delegate" if term.get("state") in TERRITORY_LIKE else "U.S. Representative"
+    return _to_official(leg, term, office, district, as_of)
+
+
+def committees_for(bioguide: str, settings: Settings) -> list[dict]:  # pragma: no cover - network
+    """Committee memberships via Congress.gov (enrichment). [] without a key."""
+    if not settings.congress_gov_api_key:
+        return []
+    resp = httpx.get(
+        f"{settings.congress_gov_base}/member/{bioguide}",
+        params={"api_key": settings.congress_gov_api_key, "format": "json"},
+        timeout=30.0,
+    )
+    resp.raise_for_status()
+    member = (resp.json() or {}).get("member") or {}
+    return member.get("committeeAssignments") or member.get("committees") or []
+
+
 def load_roster(settings: Settings | None = None) -> list[dict]:
     """Live (cached) load of legislators-current.yaml."""
     settings = settings or get_settings()

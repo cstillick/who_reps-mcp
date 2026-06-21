@@ -36,6 +36,21 @@ def list_districts(address: str) -> dict:
     return service.list_districts(address)
 
 
+@mcp.tool()
+def lookup_by_district(state: str, chamber: str, district: str | None = None) -> dict:
+    """Officials for a chamber + district, skipping geocoding. `chamber` is
+    senate|house (federal) or upper|lower (state legislature)."""
+    officials = service.lookup_by_district(state, chamber, district)
+    return {"count": len(officials), "officials": [o.model_dump() for o in officials]}
+
+
+@mcp.tool()
+def get_official_details(official_id: str) -> dict:
+    """Enriched detail for one official (committees + full contact where
+    available), by the id returned from the other tools."""
+    return service.get_official_details(official_id)
+
+
 def run_stdio() -> None:
     """Run the MCP server over stdio (the default transport)."""
     mcp.run()

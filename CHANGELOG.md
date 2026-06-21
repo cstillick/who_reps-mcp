@@ -4,6 +4,10 @@ All notable changes to this project will be documented here.
 
 ## [Unreleased]
 
+### M5 — Detail + enrichment
+- `get_official_details(official_id)`: reconstructs a federal official from the roster (committees via Congress.gov when keyed), a governor from the vendored data, or a state official via OpenStates; degrades cleanly without keys.
+- `lookup_by_district(state, chamber, district)`: federal (senate/house) from the roster; state (upper/lower) via OpenStates. All four MCP tools + matching CLI commands now implemented and tested, incl. a fully offline MCP lookup flow.
+
 ### M4 — State tier
 - `sources/openstates.py`: `people.geo` (lat/lng → state legislators), pure `parse_people` + cached live `people_geo` that degrades to `[]` without a key.
 - `sources/governors.py` + `data/governors.json`: vendored, dated governor snapshot (all 50 states) with `as_of` surfaced on every record; refresh process in `docs/governors.md`.
