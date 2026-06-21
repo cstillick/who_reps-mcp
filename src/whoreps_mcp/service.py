@@ -34,7 +34,18 @@ def lookup_officials(
     settings = settings or get_settings()
     as_of = as_of or date.today().isoformat()
 
-    geo = census.geocode(address, settings)
+    try:
+        geo = census.geocode(address, settings)
+    except census.AddressNotFound:
+        return OfficialsResponse(
+            matched_address=address,
+            divisions=[],
+            officials=[],
+            coverage_notes=[
+                f"No geocode match for {address!r}. Use a full street address — "
+                "PO boxes, new construction, and territories may not match."
+            ],
+        )
     notes: list[str] = []
 
     # Federal tier.
@@ -75,7 +86,10 @@ def lookup_officials(
 
 
 def list_districts(address: str, *, settings: Settings | None = None) -> dict:
-    geo = census.geocode(address, settings or get_settings())
+    try:
+        geo = census.geocode(address, settings or get_settings())
+    except census.AddressNotFound:
+        return {"matched_address": address, "found": False, "note": "No geocode match for address."}
     return {
         "matched_address": geo.matched_address,
         "state": geo.state,

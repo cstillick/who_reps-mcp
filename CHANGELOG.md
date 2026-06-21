@@ -2,7 +2,18 @@
 
 All notable changes to this project will be documented here.
 
-## [Unreleased]
+## [0.1.0] — first release
+
+A free, open MCP server that answers "who represents this address?" — the civic
+primitive Google's Representatives API turndown left broken. Address → districts
+(Census) → officials (open congressional + state-legislator data + vendored
+governors). The federal tier needs no API keys; the whole pipeline is tested
+offline against recorded fixtures.
+
+### M6 — Hardening + release
+- Graceful degradation for un-geocodable addresses (bad / PO box / new construction) — empty result with a note, never an error.
+- GitHub Actions CI (uv sync --frozen, ruff check + format, pytest) — fully offline, no live calls.
+- README quick-start verified; 28 tests passing.
 
 ### M5 — Detail + enrichment
 - `get_official_details(official_id)`: reconstructs a federal official from the roster (committees via Congress.gov when keyed), a governor from the vendored data, or a state official via OpenStates; degrades cleanly without keys.
