@@ -1,4 +1,4 @@
-# whoreps-mcp
+# who_reps-mcp
 
 **Address → your elected officials, as an MCP server.** A free, open replacement
 for the Google Civic Information *Representatives API*, which was shut down on
